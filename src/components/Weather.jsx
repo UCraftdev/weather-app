@@ -1,0 +1,111 @@
+import React, { useEffect, useRef, useState } from 'react'
+import './Weather.css'
+import clear_icon from '../assets/clear.png'
+import drizzle_icon from '../assets/drizzle.png'
+import clouds_icon from '../assets/clouds.png'
+import rain_icon from '../assets/rain.png'
+import snow_icon from '../assets/snow.png'
+import wind_icon from '../assets/wind.png'
+import search_icon from '../assets/search.png'
+import humidity_icon from '../assets/humidity.png'
+import mist_icon from '../assets/mist.png'
+import { use } from 'react'
+
+const Weather = () => {
+
+    const API = "ed4fe7a88ef7797122c0d284e8a81e95"
+    const inputRef = useRef();
+   const [weatherData, setWeatherData] = useState(false);
+
+   const allIcons = {
+        "01d" : clear_icon,
+        "01n" : clear_icon,
+        "02d" : clouds_icon,
+        "02n" : clouds_icon,
+        "03d" : clouds_icon,
+        "03n" : clouds_icon,
+        "04d" : drizzle_icon,
+        "04n" : drizzle_icon,
+        "09d" : rain_icon,
+        "09n" : rain_icon,
+        "10d" : rain_icon,
+        "10n" : rain_icon,
+        "13d" : snow_icon,
+        "13n" : snow_icon,
+   }
+   
+   const search = async (city) => {
+        try{
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+        const icons = allIcons[data.weather[0].icon] || clear_icon;
+        setWeatherData({
+            humidity : data.main.humidity,
+            windSpeed : data.wind.speed,
+            temperature : Math.floor(data.main.temp),
+            location : data.name,
+            icon : icons
+             
+        })
+   }catch(error){
+
+   }
+   
+
+}
+
+useEffect(()=>{
+    search("New York");
+},[])
+
+    
+
+    
+return (
+    <div>
+        <div className="card">
+        <div className="search">
+            <input ref={inputRef} type="text" placeholder="Enter city name"/>
+            <button onClick={()=>search(inputRef.current.value)}><img src={search_icon} alt="" /></button>
+        </div>
+        <div className="weather">
+            <img className="weather-icon" src={weatherData.icon}  />
+            <h1 className="temp">
+                {weatherData.temperature}°c
+            </h1>
+            <h2 className="city">
+                {weatherData.location}
+            </h2>
+            <div className="details">
+                <div className="col">
+                    <img src={humidity_icon} />
+                    <div>
+                        <p className="humidity">
+                            {weatherData.humidity} %
+                        </p>
+                        <p>
+                            Humidity
+                        </p>
+                    </div>
+                </div>
+                <div className="col">
+                    <img src={wind_icon} />
+                    <div>
+                        <p className="wind">
+                            {weatherData.windSpeed} km/h
+                        </p>
+                        <p>
+                            Wind Speed
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+)
+}
+export default Weather;
